@@ -6,13 +6,29 @@
     android:layout_height="match_parent"
     tools:context="net.dvelasco.android.startedservice.TheActivity">
 
-    <TextView
+    <EditText
+        android:id="@+id/numberInput"
+        android:layout_width="93dp"
+        android:layout_height="43dp"
+        android:gravity="center"
+        android:ems="10"
+        android:inputType="number"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        android:layout_marginBottom="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/startButton"
+        tools:layout_editor_absoluteY="139dp" />
+
+    <Button
+        android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498" />
 
 </android.support.constraint.ConstraintLayout>
