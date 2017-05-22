@@ -1,5 +1,6 @@
 package net.dvelasco.android.startedservice;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +21,8 @@ public class CountService extends Service {
     public static final String CANONICAL_NAME = CountService.class.getCanonicalName();
     private static final String ACTION_COUNT_TO = CANONICAL_NAME + "COUNT_TO";
     private static final String EXTRA_COUNT_TARGET = CANONICAL_NAME + "COUNT_TARGET";
+
+    private static final int COUNT_NOTIFICATION_ID = 1111;
 
 
     public static void startCount(int countTarget, Context clientContext) {
@@ -32,8 +36,18 @@ public class CountService extends Service {
 
     private final class CountHandler extends Handler {
 
+        private NotificationCompat.Builder mNotificationBuilder;
+        private NotificationManager mNotificationManager;
+
         CountHandler(Looper looper) {
             super(looper);
+            mNotificationBuilder =
+                new NotificationCompat.Builder(CountService.this)
+                    .setSmallIcon(android.R.drawable.stat_sys_upload_done)
+                    .setContentTitle(getString(R.string.notif_title_result))
+                    .setAutoCancel(true);
+            mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         }
 
         @Override
@@ -64,6 +78,11 @@ public class CountService extends Service {
         }
 
         private void reportResult(int target) {
+            showToast(target);
+            showNotification(target);
+        }
+
+        private void showToast(int target) {
             Toast.makeText(
                 CountService.this,
                 getString(R.string.toast_result, target),
@@ -71,6 +90,15 @@ public class CountService extends Service {
             ).show();
         }
 
+        private void showNotification(int target) {
+            mNotificationBuilder.setContentText(
+                getString(R.string.notif_content_result, target)
+            );
+            mNotificationManager.notify(
+                COUNT_NOTIFICATION_ID,
+                mNotificationBuilder.build()
+            );
+        }
     }
 
     @Override
