@@ -11,6 +11,7 @@ import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 public class CountService extends Service {
 
@@ -41,7 +42,9 @@ public class CountService extends Service {
 
             Intent request = (Intent) msg.obj;
             if (ACTION_COUNT_TO.equals(request.getAction())) {
-                countTo(request.getIntExtra(EXTRA_COUNT_TARGET, 0));
+                int target = request.getIntExtra(EXTRA_COUNT_TARGET, 0);
+                countTo(target);
+                reportResult(target);
             }
 
             // Stop the service using the startId, so that we don't stop
@@ -59,6 +62,15 @@ public class CountService extends Service {
                 }
             }
         }
+
+        private void reportResult(int target) {
+            Toast.makeText(
+                CountService.this,
+                getString(R.string.toast_result, target),
+                Toast.LENGTH_LONG
+            ).show();
+        }
+
     }
 
     @Override

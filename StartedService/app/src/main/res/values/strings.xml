@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">StartedService</string>
     <string name="startButtonText">Start</string>
+    <string name="toast_result">CountService counted up to %1$d</string>
 </resources>
