@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">StartedService</string>
+    <string name="startButtonText">Start</string>
 </resources>

@@ -3,7 +3,12 @@ package net.dvelasco.android.startedservice;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -22,9 +27,64 @@ public class CountService extends Service {
         clientContext.startService(requestIntent);
     }
 
+    private CountHandler mServiceHandler;
+
+    private final class CountHandler extends Handler {
+
+        CountHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            Log.i(TAG, "Current thread is " + Thread.currentThread().getName());
+
+            Intent request = (Intent) msg.obj;
+            if (ACTION_COUNT_TO.equals(request.getAction())) {
+                countTo(request.getIntExtra(EXTRA_COUNT_TARGET, 0));
+            }
+
+            // Stop the service using the startId, so that we don't stop
+            // the service in the middle of handling another job
+            stopSelf(msg.arg1);
+        }
+
+        private void countTo(int target) {
+            for (int i=0; i<target; i++) {
+                try {
+                    Thread.sleep(1000);
+                    Log.i(TAG, "" + (i+1));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onCreate() {
+        Log.i(TAG, "Creating...");
+
+        HandlerThread backgroundThread = new HandlerThread(
+            "CounterThread",
+            Process.THREAD_PRIORITY_BACKGROUND
+        );
+        backgroundThread.start();
+
+        mServiceHandler = new CountHandler(backgroundThread.getLooper());
+    }
+
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
+        Log.i(TAG, "Current thread is " + Thread.currentThread().getName());
+
+        Message msg = mServiceHandler.obtainMessage();
+        msg.arg1 = startId;
+        msg.obj = intent;
+        mServiceHandler.sendMessage(msg);
+
         return START_NOT_STICKY;
     }
 
@@ -33,6 +93,11 @@ public class CountService extends Service {
     public IBinder onBind(Intent intent) {
         // no binding today, null is OK
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "Destroying...");
     }
 
 }
