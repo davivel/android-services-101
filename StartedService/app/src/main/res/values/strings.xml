@@ -4,4 +4,5 @@
     <string name="toast_result">CountService counted to %1$d</string>
     <string name="notif_title_result">CountService finished</string>
     <string name="notif_content_result">The count finished at %1$d</string>
+    <string name="snackbar_result">CountService counted to %1$d</string>
 </resources>

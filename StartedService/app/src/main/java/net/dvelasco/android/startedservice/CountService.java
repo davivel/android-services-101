@@ -12,6 +12,7 @@ import android.os.Message;
 import android.os.Process;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,8 +20,9 @@ public class CountService extends Service {
 
     public static final String TAG = CountService.class.getName();
     public static final String CANONICAL_NAME = CountService.class.getCanonicalName();
-    private static final String ACTION_COUNT_TO = CANONICAL_NAME + "COUNT_TO";
-    private static final String EXTRA_COUNT_TARGET = CANONICAL_NAME + "COUNT_TARGET";
+    private static final String ACTION_COUNT_TO = CANONICAL_NAME + ".COUNT_TO";
+    public static final String EXTRA_COUNT_TARGET = CANONICAL_NAME + ".COUNT_TARGET";
+    public static final String EVENT_COUNT_FINISHED = CANONICAL_NAME + ".COUNT_FINISHED";
 
     private static final int COUNT_NOTIFICATION_ID = 1111;
 
@@ -80,6 +82,7 @@ public class CountService extends Service {
         private void reportResult(int target) {
             showToast(target);
             showNotification(target);
+            sendBroadcast(target);
         }
 
         private void showToast(int target) {
@@ -99,6 +102,16 @@ public class CountService extends Service {
                 mNotificationBuilder.build()
             );
         }
+
+        private void sendBroadcast(int target) {
+            LocalBroadcastManager broadcastManager =
+                LocalBroadcastManager.getInstance(CountService.this);
+
+            Intent resultIntent = new Intent(EVENT_COUNT_FINISHED);
+            resultIntent.putExtra(EXTRA_COUNT_TARGET, target);
+            broadcastManager.sendBroadcast(resultIntent);
+        }
+
     }
 
     @Override
